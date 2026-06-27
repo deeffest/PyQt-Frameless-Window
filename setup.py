@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="PySideSix-Frameless-Window",
+    name="PySide6-Frameless-Window",
     version="0.8.1",
     keywords="pyside6 frameless",
     author="zhiyiYo",
