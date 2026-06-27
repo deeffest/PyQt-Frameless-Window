@@ -3,7 +3,7 @@ import sys
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from qframelesswindow import AcrylicWindow, FramelessWindow
+from qframelesswindow5 import AcrylicWindow, FramelessWindow
 
 
 class FramelessWebEngineView(QWebEngineView):
