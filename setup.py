@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="PyQt5-Frameless-Window",
-    version="0.8.1+20260714",
+    version="0.8.2+20260815",
     packages=setuptools.find_packages(),
     install_requires=[
         "pywin32;platform_system=='Windows'",
