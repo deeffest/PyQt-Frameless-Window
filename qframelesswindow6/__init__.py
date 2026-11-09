@@ -20,7 +20,13 @@ import sys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QMainWindow
 
-from .titlebar import TitleBar, TitleBarButton, SvgTitleBarButton, StandardTitleBar, TitleBarBase
+from .titlebar import (
+    TitleBar,
+    TitleBarButton,
+    SvgTitleBarButton,
+    StandardTitleBar,
+    TitleBarBase,
+)
 
 if sys.platform == "win32":
     from .windows import AcrylicWindow
@@ -41,4 +47,3 @@ else:
     from .linux import LinuxWindowEffect as WindowEffect
 
     AcrylicWindow = FramelessWindow
-

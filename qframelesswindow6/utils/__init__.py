@@ -16,7 +16,7 @@ else:
 
 
 def startSystemMove(window, globalPos):
-    """ resize window
+    """resize window
 
     Parameters
     ----------
@@ -41,7 +41,7 @@ def toggleMaxState(window):
 
 
 def starSystemResize(window, globalPos, edges):
-    """ resize window
+    """resize window
 
     Parameters
     ----------

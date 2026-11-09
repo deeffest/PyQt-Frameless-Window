@@ -8,7 +8,7 @@ from .window_effect import LinuxWindowEffect
 
 
 class LinuxFramelessWindowBase:
-    """ Frameless window base class for Linux system """
+    """Frameless window base class for Linux system"""
 
     BORDER_WIDTH = 5
 
@@ -34,11 +34,11 @@ class LinuxFramelessWindowBase:
         self.titleBar.resize(self.width(), self.titleBar.height())
 
     def refreshBackgroundBlurEffect(self):
-        """ Refresh background blur effect """
+        """Refresh background blur effect"""
         pass
 
     def setStayOnTop(self, isTop: bool):
-        """ set the stay on top status """
+        """set the stay on top status"""
         if isTop:
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         else:
@@ -48,14 +48,14 @@ class LinuxFramelessWindowBase:
         self.show()
 
     def toggleStayOnTop(self):
-        """ toggle the stay on top status """
+        """toggle the stay on top status"""
         if self.windowFlags() & Qt.WindowStaysOnTopHint:
             self.setStayOnTop(False)
         else:
             self.setStayOnTop(True)
 
     def setTitleBar(self, titleBar):
-        """ set custom title bar
+        """set custom title bar
 
         Parameters
         ----------
@@ -69,19 +69,19 @@ class LinuxFramelessWindowBase:
         self.titleBar.raise_()
 
     def setResizeEnabled(self, isEnabled: bool):
-        """ set whether resizing is enabled """
+        """set whether resizing is enabled"""
         self._isResizeEnabled = isEnabled
 
     def isSystemButtonVisible(self):
-        """ Returns whether the system title bar button is visible """
+        """Returns whether the system title bar button is visible"""
         return self._isSystemButtonVisible
 
     def setSystemTitleBarButtonVisible(self, isVisible):
-        """ set the visibility of system title bar button, only works for macOS """
+        """set the visibility of system title bar button, only works for macOS"""
         pass
 
     def systemTitleBarRect(self, size: QSize) -> QRect:
-        """ Returns the system title bar rect, only works for macOS
+        """Returns the system title bar rect, only works for macOS
 
         Parameters
         ----------
@@ -92,18 +92,22 @@ class LinuxFramelessWindowBase:
 
     def eventFilter(self, obj, event):
         et = event.type()
-        if et != QEvent.MouseButtonPress and et != QEvent.MouseMove or not self._isResizeEnabled:
+        if (
+            et != QEvent.MouseButtonPress
+            and et != QEvent.MouseMove
+            or not self._isResizeEnabled
+        ):
             return False
 
         edges = Qt.Edge(0)
         pos = event.globalPos() - self.pos()
         if pos.x() < self.BORDER_WIDTH:
             edges |= Qt.LeftEdge
-        if pos.x() >= self.width()-self.BORDER_WIDTH:
+        if pos.x() >= self.width() - self.BORDER_WIDTH:
             edges |= Qt.RightEdge
         if pos.y() < self.BORDER_WIDTH:
             edges |= Qt.TopEdge
-        if pos.y() >= self.height()-self.BORDER_WIDTH:
+        if pos.y() >= self.height() - self.BORDER_WIDTH:
             edges |= Qt.BottomEdge
 
         # change cursor
@@ -126,7 +130,7 @@ class LinuxFramelessWindowBase:
 
 
 class LinuxFramelessWindow(LinuxFramelessWindowBase, QWidget):
-    """ Frameless window for Linux system """
+    """Frameless window for Linux system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -134,7 +138,7 @@ class LinuxFramelessWindow(LinuxFramelessWindowBase, QWidget):
 
 
 class LinuxFramelessMainWindow(LinuxFramelessWindowBase, QMainWindow):
-    """ Frameless main window for Linux system """
+    """Frameless main window for Linux system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -142,7 +146,7 @@ class LinuxFramelessMainWindow(LinuxFramelessWindowBase, QMainWindow):
 
 
 class LinuxFramelessDialog(LinuxFramelessWindowBase, QDialog):
-    """ Frameless dialog for Windows system """
+    """Frameless dialog for Windows system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)

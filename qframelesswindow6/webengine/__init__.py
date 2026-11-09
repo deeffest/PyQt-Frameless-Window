@@ -3,11 +3,16 @@ import sys
 
 from PySide6.QtCore import Qt
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from qframelesswindow6 import AcrylicWindow, FramelessWindow, FramelessMainWindow, FramelessDialog
+from qframelesswindow6 import (
+    AcrylicWindow,
+    FramelessWindow,
+    FramelessMainWindow,
+    FramelessDialog,
+)
 
 
 class FramelessWebEngineView(QWebEngineView):
-    """ Frameless web engine view """
+    """Frameless web engine view"""
 
     def __init__(self, parent):
         if sys.platform == "win32" and isinstance(parent.window(), AcrylicWindow):
@@ -18,5 +23,7 @@ class FramelessWebEngineView(QWebEngineView):
         if sys.platform in ("win32", "darwin"):
             self.setHtml("")
 
-        if isinstance(self.window(), (FramelessWindow, FramelessMainWindow, FramelessDialog)):
+        if isinstance(
+            self.window(), (FramelessWindow, FramelessMainWindow, FramelessDialog)
+        ):
             self.window().updateFrameless()

@@ -6,18 +6,21 @@ import objc
 from PySide6.QtCore import qVersion, QEvent, QObject
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QWidget
-from Quartz.CoreGraphics import (CGEventCreateMouseEvent,
-                                 kCGEventLeftMouseDown, kCGMouseButtonLeft)
+from Quartz.CoreGraphics import (
+    CGEventCreateMouseEvent,
+    kCGEventLeftMouseDown,
+    kCGMouseButtonLeft,
+)
 
-QT_VERSION = tuple(int(v) for v in qVersion().split('.'))
+QT_VERSION = tuple(int(v) for v in qVersion().split("."))
 
 
 class MacMoveResize:
-    """ Tool class for moving and resizing Mac OS window """
+    """Tool class for moving and resizing Mac OS window"""
 
     @staticmethod
     def startSystemMove(window: QWidget, globalPos):
-        """ resize window
+        """resize window
 
         Parameters
         ----------
@@ -35,7 +38,11 @@ class MacMoveResize:
 
         # send click event
         cgEvent = CGEventCreateMouseEvent(
-            None, kCGEventLeftMouseDown, (globalPos.x(), globalPos.y()), kCGMouseButtonLeft)
+            None,
+            kCGEventLeftMouseDown,
+            (globalPos.x(), globalPos.y()),
+            kCGMouseButtonLeft,
+        )
         clickEvent = Cocoa.NSEvent.eventWithCGEvent_(cgEvent)
 
         if clickEvent:
@@ -45,7 +52,7 @@ class MacMoveResize:
 
     @classmethod
     def starSystemResize(cls, window, globalPos, edges):
-        """ resize window
+        """resize window
 
         Parameters
         ----------
@@ -69,7 +76,7 @@ class MacMoveResize:
 
 
 def getNSWindow(winId):
-    """ convert window handle to NSWindow
+    """convert window handle to NSWindow
 
     Parameters
     ----------
@@ -81,7 +88,7 @@ def getNSWindow(winId):
 
 
 def getSystemAccentColor():
-    """ get the accent color of system
+    """get the accent color of system
 
     Returns
     -------
@@ -97,7 +104,7 @@ def getSystemAccentColor():
 
 
 class MacScreenCaptureFilter(QObject):
-    """ Filter for screen capture """
+    """Filter for screen capture"""
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -111,11 +118,13 @@ class MacScreenCaptureFilter(QObject):
         return super().eventFilter(watched, event)
 
     def setScreenCaptureEnabled(self, enabled: bool):
-        """ Set screen capture enabled """
+        """Set screen capture enabled"""
         self.isScreenCaptureEnabled = enabled
 
         nsWindow = getNSWindow(self.parent().winId())
         if nsWindow:
             NSWindowSharingNone = 0
             NSWindowSharingReadOnly = 1
-            nsWindow.setSharingType_(NSWindowSharingReadOnly if enabled else NSWindowSharingNone)
+            nsWindow.setSharingType_(
+                NSWindowSharingReadOnly if enabled else NSWindowSharingNone
+            )

@@ -11,13 +11,18 @@ from PySide6.QtWidgets import QApplication, QDialog, QWidget, QMainWindow
 
 from ..titlebar import TitleBar
 from ..utils import win32_utils as win_utils
-from ..utils.win32_utils import Taskbar, isSystemBorderAccentEnabled, getSystemAccentColor, QT_VERSION
+from ..utils.win32_utils import (
+    Taskbar,
+    isSystemBorderAccentEnabled,
+    getSystemAccentColor,
+    QT_VERSION,
+)
 from .c_structures import LPNCCALCSIZE_PARAMS
 from .window_effect import WindowsWindowEffect
 
 
 class WindowsFramelessWindowBase:
-    """ Frameless window base class for Windows system """
+    """Frameless window base class for Windows system"""
 
     BORDER_WIDTH = 5
 
@@ -39,8 +44,12 @@ class WindowsFramelessWindowBase:
         self.titleBar.raise_()
 
     def updateFrameless(self):
-        """ update frameless window """
-        stayOnTop = Qt.WindowStaysOnTopHint if self.windowFlags() & Qt.WindowStaysOnTopHint else 0
+        """update frameless window"""
+        stayOnTop = (
+            Qt.WindowStaysOnTopHint
+            if self.windowFlags() & Qt.WindowStaysOnTopHint
+            else 0
+        )
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint | stayOnTop)
 
         # add DWM shadow and window animation
@@ -49,14 +58,14 @@ class WindowsFramelessWindowBase:
             self.windowEffect.addShadowEffect(self.winId())
 
     def refreshBackgroundBlurEffect(self):
-        """ Refresh background blur effect """
+        """Refresh background blur effect"""
         self.windowEffect.disableBlurBehindWindow(self.winId())
         self.windowEffect.removeWindowAnimation(self.winId())
         self.windowEffect.enableBlurBehindWindow(self.winId())
         self.windowEffect.addWindowAnimation(self.winId())
 
     def setTitleBar(self, titleBar):
-        """ set custom title bar
+        """set custom title bar
 
         Parameters
         ----------
@@ -70,11 +79,11 @@ class WindowsFramelessWindowBase:
         self.titleBar.raise_()
 
     def setResizeEnabled(self, isEnabled: bool):
-        """ set whether resizing is enabled """
+        """set whether resizing is enabled"""
         self._isResizeEnabled = isEnabled
 
     def setStayOnTop(self, isTop: bool):
-        """ set the stay on top status """
+        """set the stay on top status"""
         if isTop:
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         else:
@@ -84,22 +93,22 @@ class WindowsFramelessWindowBase:
         self.show()
 
     def toggleStayOnTop(self):
-        """ toggle the stay on top status """
+        """toggle the stay on top status"""
         if self.windowFlags() & Qt.WindowStaysOnTopHint:
             self.setStayOnTop(False)
         else:
             self.setStayOnTop(True)
 
     def isSystemButtonVisible(self):
-        """ Returns whether the system title bar button is visible """
+        """Returns whether the system title bar button is visible"""
         return self._isSystemButtonVisible
 
     def setSystemTitleBarButtonVisible(self, isVisible):
-        """ set the visibility of system title bar button, only works for macOS """
+        """set the visibility of system title bar button, only works for macOS"""
         pass
 
     def systemTitleBarRect(self, size: QSize) -> QRect:
-        """ Returns the system title bar rect, only works for macOS
+        """Returns the system title bar rect, only works for macOS
 
         Parameters
         ----------
@@ -109,7 +118,7 @@ class WindowsFramelessWindowBase:
         return QRect(0, 0, size.width(), size.height())
 
     def nativeEvent(self, eventType, message):
-        """ Handle the Windows message """
+        """Handle the Windows message"""
         msg = MSG.from_address(message.__int__())
         if not msg.hWnd:
             return False, 0
@@ -122,7 +131,11 @@ class WindowsFramelessWindowBase:
             h = clientRect[3] - clientRect[1]
 
             # fixes https://github.com/zhiyiYo/PyQt-Frameless-Window/issues/98
-            bw = 0 if win_utils.isMaximized(msg.hWnd) or win_utils.isFullScreen(msg.hWnd) else self.BORDER_WIDTH
+            bw = (
+                0
+                if win_utils.isMaximized(msg.hWnd) or win_utils.isFullScreen(msg.hWnd)
+                else self.BORDER_WIDTH
+            )
             lx = xPos < bw  # left
             rx = xPos > w - bw  # right
             ty = yPos < bw  # top
@@ -185,15 +198,22 @@ class WindowsFramelessWindowBase:
 
     def __onScreenChanged(self):
         hWnd = int(self.windowHandle().winId())
-        win32gui.SetWindowPos(hWnd, None, 0, 0, 0, 0, win32con.SWP_NOMOVE |
-                              win32con.SWP_NOSIZE | win32con.SWP_FRAMECHANGED)
+        win32gui.SetWindowPos(
+            hWnd,
+            None,
+            0,
+            0,
+            0,
+            0,
+            win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_FRAMECHANGED,
+        )
 
     def resizeEvent(self, e):
         self.titleBar.resize(self.width(), self.titleBar.height())
 
 
 class WindowsFramelessWindow(WindowsFramelessWindowBase, QWidget):
-    """  Frameless window for Windows system """
+    """Frameless window for Windows system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -201,7 +221,7 @@ class WindowsFramelessWindow(WindowsFramelessWindowBase, QWidget):
 
 
 class AcrylicWindow(WindowsFramelessWindow):
-    """ A frameless window with acrylic effect """
+    """A frameless window with acrylic effect"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -214,7 +234,11 @@ class AcrylicWindow(WindowsFramelessWindow):
         self.setStyleSheet("AcrylicWindow{background:transparent}")
 
     def updateFrameless(self):
-        stayOnTop = Qt.WindowStaysOnTopHint if self.windowFlags() & Qt.WindowStaysOnTopHint else 0
+        stayOnTop = (
+            Qt.WindowStaysOnTopHint
+            if self.windowFlags() & Qt.WindowStaysOnTopHint
+            else 0
+        )
         if QT_VERSION < (6, 10, 0):
             self.setWindowFlags(Qt.FramelessWindowHint | stayOnTop)
         else:
@@ -229,7 +253,7 @@ class AcrylicWindow(WindowsFramelessWindow):
             self.windowEffect.addShadowEffect(self.winId())
 
     def nativeEvent(self, eventType, message):
-        """ Handle the Windows message """
+        """Handle the Windows message"""
         msg = MSG.from_address(message.__int__())
 
         # handle Alt+F4
@@ -259,7 +283,7 @@ class AcrylicWindow(WindowsFramelessWindow):
 
 
 class WindowsFramelessMainWindow(WindowsFramelessWindowBase, QMainWindow):
-    """ Frameless main window for Windows system """
+    """Frameless main window for Windows system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -267,7 +291,7 @@ class WindowsFramelessMainWindow(WindowsFramelessWindowBase, QMainWindow):
 
 
 class WindowsFramelessDialog(WindowsFramelessWindowBase, QDialog):
-    """ Frameless dialog for Windows system """
+    """Frameless dialog for Windows system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -276,4 +300,3 @@ class WindowsFramelessDialog(WindowsFramelessWindowBase, QDialog):
         self.titleBar.maxBtn.hide()
         self.titleBar.setDoubleClickEnabled(False)
         self.windowEffect.disableMaximizeButton(self.winId())
-

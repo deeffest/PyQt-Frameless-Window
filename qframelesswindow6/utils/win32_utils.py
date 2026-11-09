@@ -1,7 +1,18 @@
 # coding:utf-8
 import sys
 import warnings
-from ctypes import Structure, byref, sizeof, windll, c_int, c_ulong, c_bool, POINTER, WinDLL, wintypes
+from ctypes import (
+    Structure,
+    byref,
+    sizeof,
+    windll,
+    c_int,
+    c_ulong,
+    c_bool,
+    POINTER,
+    WinDLL,
+    wintypes,
+)
 from ctypes.wintypes import DWORD, HWND, LPARAM, RECT, UINT
 from platform import platform
 from winreg import OpenKey, HKEY_CURRENT_USER, KEY_READ, QueryValueEx, CloseKey
@@ -10,18 +21,24 @@ import win32api
 import win32con
 import win32gui
 import win32print
-from PySide6.QtCore import QOperatingSystemVersion, QVersionNumber, QObject, QEvent, qVersion
+from PySide6.QtCore import (
+    QOperatingSystemVersion,
+    QVersionNumber,
+    QObject,
+    QEvent,
+    qVersion,
+)
 from PySide6.QtGui import QGuiApplication, QColor
 from PySide6.QtWidgets import QWidget
 
 ABM_GETSTATE = 4
 ABS_AUTOHIDE = 1
 ABM_GETTASKBARPOS = 5
-QT_VERSION = tuple(int(v) for v in qVersion().split('.'))
+QT_VERSION = tuple(int(v) for v in qVersion().split("."))
 
 
 def getSystemAccentColor():
-    """ get the accent color of system
+    """get the accent color of system
 
     Returns
     -------
@@ -43,7 +60,7 @@ def getSystemAccentColor():
 
 
 def isSystemBorderAccentEnabled():
-    """ Check whether the border accent is enabled """
+    """Check whether the border accent is enabled"""
     if not isGreaterEqualWin11():
         return False
 
@@ -58,7 +75,7 @@ def isSystemBorderAccentEnabled():
 
 
 def isMaximized(hWnd):
-    """ Determine whether the window is maximized
+    """Determine whether the window is maximized
 
     Parameters
     ----------
@@ -73,7 +90,7 @@ def isMaximized(hWnd):
 
 
 def isFullScreen(hWnd):
-    """ Determine whether the window is full screen
+    """Determine whether the window is full screen
 
     Parameters
     ----------
@@ -97,14 +114,14 @@ def isFullScreen(hWnd):
 
 
 def isCompositionEnabled():
-    """ detect if dwm composition is enabled """
+    """detect if dwm composition is enabled"""
     bResult = c_int(0)
     windll.dwmapi.DwmIsCompositionEnabled(byref(bResult))
     return bool(bResult.value)
 
 
 def getMonitorInfo(hWnd, dwFlags):
-    """ get monitor info, return `None` if failed
+    """get monitor info, return `None` if failed
 
     Parameters
     ----------
@@ -122,7 +139,7 @@ def getMonitorInfo(hWnd, dwFlags):
 
 
 def getResizeBorderThickness(hWnd, horizontal=True):
-    """ get resize border thickness of widget
+    """get resize border thickness of widget
 
     Parameters
     ----------
@@ -137,18 +154,20 @@ def getResizeBorderThickness(hWnd, horizontal=True):
         return 0
 
     frame = win32con.SM_CXSIZEFRAME if horizontal else win32con.SM_CYSIZEFRAME
-    result = getSystemMetrics(hWnd, frame, horizontal) + getSystemMetrics(hWnd, 92, horizontal)
+    result = getSystemMetrics(hWnd, frame, horizontal) + getSystemMetrics(
+        hWnd, 92, horizontal
+    )
 
     if result > 0:
         return result
 
     thickness = 8 if isCompositionEnabled() else 4
-    return round(thickness*window.devicePixelRatio())
+    return round(thickness * window.devicePixelRatio())
 
 
 def getSystemMetrics(hWnd, index, horizontal):
-    """ get system metrics """
-    if not hasattr(windll.user32, 'GetSystemMetricsForDpi'):
+    """get system metrics"""
+    if not hasattr(windll.user32, "GetSystemMetricsForDpi"):
         return win32api.GetSystemMetrics(index)
 
     dpi = getDpiForWindow(hWnd, horizontal)
@@ -156,7 +175,7 @@ def getSystemMetrics(hWnd, index, horizontal):
 
 
 def getDpiForWindow(hWnd, horizontal=True):
-    """ get dpi for window
+    """get dpi for window
 
     Parameters
     ----------
@@ -166,7 +185,7 @@ def getDpiForWindow(hWnd, horizontal=True):
     dpiScale: bool
         whether to use dpi scale
     """
-    if hasattr(windll.user32, 'GetDpiForWindow'):
+    if hasattr(windll.user32, "GetDpiForWindow"):
         windll.user32.GetDpiForWindow.argtypes = [HWND]
         windll.user32.GetDpiForWindow.restype = UINT
         return windll.user32.GetDpiForWindow(hWnd)
@@ -187,7 +206,7 @@ def getDpiForWindow(hWnd, horizontal=True):
 
 
 def findWindow(hWnd):
-    """ find window by hWnd, return `None` if not found
+    """find window by hWnd, return `None` if not found
 
     Parameters
     ----------
@@ -208,30 +227,30 @@ def findWindow(hWnd):
 
 
 def isGreaterEqualWin8_1():
-    """ determine if the windows version ≥ Win8.1 """
+    """determine if the windows version ≥ Win8.1"""
     cv = QOperatingSystemVersion.current()
     cv = QVersionNumber(cv.majorVersion(), cv.minorVersion(), cv.microVersion())
     return cv >= QVersionNumber(8, 1, 0)
 
 
 def isGreaterEqualWin10():
-    """ determine if the windows version ≥ Win10 """
+    """determine if the windows version ≥ Win10"""
     cv = QOperatingSystemVersion.current()
     return sys.platform == "win32" and cv.majorVersion() >= 10
 
 
 def isGreaterEqualWin11():
-    """ determine if the windows version ≥ Win11 """
+    """determine if the windows version ≥ Win11"""
     return isGreaterEqualWin10() and sys.getwindowsversion().build >= 22000
 
 
 def isWin7():
-    """ determine if the windows version is Win7 """
+    """determine if the windows version is Win7"""
     return "Windows-7" in platform()
 
 
 def releaseMouseLeftButton(hWnd, x=0, y=0):
-    """ release mouse left button at (x, y)
+    """release mouse left button at (x, y)
 
     Parameters
     ----------
@@ -250,12 +269,12 @@ def releaseMouseLeftButton(hWnd, x=0, y=0):
 
 class APPBARDATA(Structure):
     _fields_ = [
-        ('cbSize',            DWORD),
-        ('hWnd',              HWND),
-        ('uCallbackMessage',  UINT),
-        ('uEdge',             UINT),
-        ('rc',                RECT),
-        ('lParam',            LPARAM),
+        ("cbSize", DWORD),
+        ("hWnd", HWND),
+        ("uCallbackMessage", UINT),
+        ("uEdge", UINT),
+        ("rc", RECT),
+        ("lParam", LPARAM),
     ]
 
 
@@ -271,16 +290,15 @@ class Taskbar:
 
     @staticmethod
     def isAutoHide():
-        """ detect whether the taskbar is hidden automatically """
-        appbarData = APPBARDATA(sizeof(APPBARDATA), 0,
-                                0, 0, RECT(0, 0, 0, 0), 0)
+        """detect whether the taskbar is hidden automatically"""
+        appbarData = APPBARDATA(sizeof(APPBARDATA), 0, 0, 0, RECT(0, 0, 0, 0), 0)
         taskbarState = windll.shell32.SHAppBarMessage(ABM_GETSTATE, byref(appbarData))
 
         return taskbarState == ABS_AUTOHIDE
 
     @classmethod
     def getPosition(cls, hWnd):
-        """ get the position of auto-hide task bar
+        """get the position of auto-hide task bar
 
         Parameters
         ----------
@@ -288,12 +306,11 @@ class Taskbar:
             window handle
         """
         if isGreaterEqualWin8_1():
-            monitorInfo = getMonitorInfo(
-                hWnd, win32con.MONITOR_DEFAULTTONEAREST)
+            monitorInfo = getMonitorInfo(hWnd, win32con.MONITOR_DEFAULTTONEAREST)
             if not monitorInfo:
                 return cls.NO_POSITION
 
-            monitor = RECT(*monitorInfo['Monitor'])
+            monitor = RECT(*monitorInfo["Monitor"])
             appbarData = APPBARDATA(sizeof(APPBARDATA), 0, 0, 0, monitor, 0)
             positions = [cls.LEFT, cls.TOP, cls.RIGHT, cls.BOTTOM]
             for position in positions:
@@ -303,16 +320,24 @@ class Taskbar:
 
             return cls.NO_POSITION
 
-        appbarData = APPBARDATA(sizeof(APPBARDATA), win32gui.FindWindow(
-            "Shell_TrayWnd", None), 0, 0, RECT(0, 0, 0, 0), 0)
+        appbarData = APPBARDATA(
+            sizeof(APPBARDATA),
+            win32gui.FindWindow("Shell_TrayWnd", None),
+            0,
+            0,
+            RECT(0, 0, 0, 0),
+            0,
+        )
         if appbarData.hWnd:
             windowMonitor = win32api.MonitorFromWindow(
-                hWnd, win32con.MONITOR_DEFAULTTONEAREST)
+                hWnd, win32con.MONITOR_DEFAULTTONEAREST
+            )
             if not windowMonitor:
                 return cls.NO_POSITION
 
             taskbarMonitor = win32api.MonitorFromWindow(
-                appbarData.hWnd, win32con.MONITOR_DEFAULTTOPRIMARY)
+                appbarData.hWnd, win32con.MONITOR_DEFAULTTOPRIMARY
+            )
             if not taskbarMonitor:
                 return cls.NO_POSITION
 
@@ -324,11 +349,11 @@ class Taskbar:
 
 
 class WindowsMoveResize:
-    """ Tool class for moving and resizing Windows window """
+    """Tool class for moving and resizing Windows window"""
 
     @staticmethod
     def startSystemMove(window, globalPos):
-        """ resize window
+        """resize window
 
         Parameters
         ----------
@@ -343,12 +368,12 @@ class WindowsMoveResize:
             int(window.winId()),
             win32con.WM_SYSCOMMAND,
             win32con.SC_MOVE | win32con.HTCAPTION,
-            0
+            0,
         )
 
     @classmethod
     def starSystemResize(cls, window, globalPos, edges):
-        """ resize window
+        """resize window
 
         Parameters
         ----------
@@ -372,15 +397,19 @@ class WindowsMoveResize:
                 window.showMaximized()
         else:
             if window.isMaximized():
-                win32gui.PostMessage(int(window.winId()), win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
+                win32gui.PostMessage(
+                    int(window.winId()), win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0
+                )
             else:
-                win32gui.PostMessage(int(window.winId()), win32con.WM_SYSCOMMAND, win32con.SC_MAXIMIZE, 0)
+                win32gui.PostMessage(
+                    int(window.winId()), win32con.WM_SYSCOMMAND, win32con.SC_MAXIMIZE, 0
+                )
 
         releaseMouseLeftButton(window.winId())
 
 
 class WindowsScreenCaptureFilter(QObject):
-    """ Filter for screen capture """
+    """Filter for screen capture"""
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -394,14 +423,16 @@ class WindowsScreenCaptureFilter(QObject):
         return super().eventFilter(watched, event)
 
     def setScreenCaptureEnabled(self, enabled: bool):
-        """ Set screen capture enabled """
+        """Set screen capture enabled"""
         self.isScreenCaptureEnabled = enabled
         WDA_NONE = 0x00000000
         WDA_EXCLUDEFROMCAPTURE = 0x00000011
 
-        user32 = WinDLL('user32', use_last_error=True)
+        user32 = WinDLL("user32", use_last_error=True)
         SetWindowDisplayAffinity = user32.SetWindowDisplayAffinity
         SetWindowDisplayAffinity.argtypes = (wintypes.HWND, wintypes.DWORD)
         SetWindowDisplayAffinity.restype = wintypes.BOOL
 
-        SetWindowDisplayAffinity(int(self.parent().winId()), WDA_NONE if enabled else WDA_EXCLUDEFROMCAPTURE)
+        SetWindowDisplayAffinity(
+            int(self.parent().winId()), WDA_NONE if enabled else WDA_EXCLUDEFROMCAPTURE
+        )
