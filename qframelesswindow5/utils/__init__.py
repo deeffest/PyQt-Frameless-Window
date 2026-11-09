@@ -16,7 +16,7 @@ else:
 
 
 def startSystemMove(window, globalPos):
-    """ resize window
+    """resize window
 
     Parameters
     ----------
@@ -30,7 +30,7 @@ def startSystemMove(window, globalPos):
 
 
 def starSystemResize(window, globalPos, edges):
-    """ resize window
+    """resize window
 
     Parameters
     ----------

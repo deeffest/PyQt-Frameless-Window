@@ -7,13 +7,20 @@ from PyQt5.QtCore import QPointF, Qt, QEvent, QPoint, QObject
 from PyQt5.QtGui import QMouseEvent, QColor
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtX11Extras import QX11Info
-from xcffib.xproto import (ButtonIndex, ButtonMask, ButtonReleaseEvent,
-                           ClientMessageData, ClientMessageEvent, EventMask,
-                           xprotoExtension)
+from xcffib.xproto import (
+    ButtonIndex,
+    ButtonMask,
+    ButtonReleaseEvent,
+    ClientMessageData,
+    ClientMessageEvent,
+    EventMask,
+    xprotoExtension,
+)
 
 
 class WindowMessage(Enum):
-    """ Window message enum class """
+    """Window message enum class"""
+
     # refer to: https://specifications.freedesktop.org/wm-spec/1.1/x170.html
     _NET_WM_MOVERESIZE_SIZE_TOPLEFT = 0
     _NET_WM_MOVERESIZE_SIZE_TOP = 1
@@ -30,13 +37,13 @@ class WindowMessage(Enum):
 
 
 class LinuxMoveResize:
-    """ Tool class for moving and resizing window """
+    """Tool class for moving and resizing window"""
 
     moveResizeAtom = None
 
     @classmethod
     def sendButtonReleaseEvent(cls, window, globalPos):
-        """ send button release event
+        """send button release event
 
         Parameters
         ----------
@@ -46,8 +53,7 @@ class LinuxMoveResize:
         globalPos: QPoint
             the global point of mouse release event
         """
-        globalPos = QPointF(QPointF(globalPos) *
-                            window.devicePixelRatio()).toPoint()
+        globalPos = QPointF(QPointF(globalPos) * window.devicePixelRatio()).toPoint()
         pos = window.mapFromGlobal(globalPos)
 
         # open the connection to X server
@@ -74,7 +80,7 @@ class LinuxMoveResize:
 
     @classmethod
     def startSystemMoveResize(cls, window, globalPos, message):
-        """ resize window
+        """resize window
 
         Parameters
         ----------
@@ -89,54 +95,57 @@ class LinuxMoveResize:
         """
         cls.sendButtonReleaseEvent(window, globalPos)
 
-        globalPos = QPointF(QPointF(globalPos) *
-                            window.devicePixelRatio()).toPoint()
+        globalPos = QPointF(QPointF(globalPos) * window.devicePixelRatio()).toPoint()
 
         # open the connection to X server
         conn = xcb.wrap(sip.unwrapinstance(QX11Info.connection()))
         xproto = xprotoExtension(conn)
 
         if not cls.moveResizeAtom:
-            cls.moveResizeAtom = xproto.InternAtom(
-                False, len("_NET_WM_MOVERESIZE"), "_NET_WM_MOVERESIZE").reply().atom
+            cls.moveResizeAtom = (
+                xproto.InternAtom(
+                    False, len("_NET_WM_MOVERESIZE"), "_NET_WM_MOVERESIZE"
+                )
+                .reply()
+                .atom
+            )
 
-        union = ClientMessageData.synthetic([
-            globalPos.x(),
-            globalPos.y(),
-            message,
-            ButtonIndex._1,
-            0
-        ], "I"*5)
+        union = ClientMessageData.synthetic(
+            [globalPos.x(), globalPos.y(), message, ButtonIndex._1, 0], "I" * 5
+        )
         event = ClientMessageEvent.synthetic(
-            format=32,
-            window=int(window.winId()),
-            type=cls.moveResizeAtom,
-            data=union
+            format=32, window=int(window.winId()), type=cls.moveResizeAtom, data=union
         )
         xproto.UngrabPointer(xcb.CurrentTime)
         xproto.SendEvent(
             False,
             QX11Info.appRootWindow(QX11Info.appScreen()),
             EventMask.SubstructureRedirect | EventMask.SubstructureNotify,
-            event.pack()
+            event.pack(),
         )
         conn.flush()
 
     @classmethod
     def startSystemMove(cls, window, globalPos):
-        """ move window """
+        """move window"""
         if QX11Info.isPlatformX11():
             cls.startSystemMoveResize(
-                window, globalPos, WindowMessage._NET_WM_MOVERESIZE_MOVE.value)
+                window, globalPos, WindowMessage._NET_WM_MOVERESIZE_MOVE.value
+            )
         else:
             window.windowHandle().startSystemMove()
-            event = QMouseEvent(QEvent.MouseButtonRelease, QPoint(-1, -1),
-                                Qt.LeftButton, Qt.NoButton, Qt.NoModifier)
+            event = QMouseEvent(
+                QEvent.MouseButtonRelease,
+                QPoint(-1, -1),
+                Qt.LeftButton,
+                Qt.NoButton,
+                Qt.NoModifier,
+            )
             QApplication.instance().postEvent(window.windowHandle(), event)
 
     @classmethod
     def starSystemResize(cls, window, globalPos, edges):
-        """ resize window
+        """resize window
 
         Parameters
         ----------
@@ -156,10 +165,13 @@ class LinuxMoveResize:
             messageMap = {
                 Qt.TopEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_TOP,
                 Qt.TopEdge | Qt.LeftEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_TOPLEFT,
-                Qt.TopEdge | Qt.RightEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_TOPRIGHT,
+                Qt.TopEdge
+                | Qt.RightEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_TOPRIGHT,
                 Qt.BottomEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_BOTTOM,
-                Qt.BottomEdge | Qt.LeftEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT,
-                Qt.BottomEdge | Qt.RightEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT,
+                Qt.BottomEdge
+                | Qt.LeftEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT,
+                Qt.BottomEdge
+                | Qt.RightEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT,
                 Qt.LeftEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_LEFT,
                 Qt.RightEdge: WindowMessage._NET_WM_MOVERESIZE_SIZE_RIGHT,
             }
@@ -169,7 +181,7 @@ class LinuxMoveResize:
 
 
 def getSystemAccentColor():
-    """ get the accent color of system
+    """get the accent color of system
 
     Returns
     -------
@@ -180,7 +192,7 @@ def getSystemAccentColor():
 
 
 class LinuxScreenCaptureFilter(QObject):
-    """ Filter for screen capture """
+    """Filter for screen capture"""
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -194,5 +206,5 @@ class LinuxScreenCaptureFilter(QObject):
         return super().eventFilter(watched, event)
 
     def setScreenCaptureEnabled(self, enabled: bool):
-        """ Set screen capture enabled """
+        """Set screen capture enabled"""
         self.isScreenCaptureEnabled = enabled

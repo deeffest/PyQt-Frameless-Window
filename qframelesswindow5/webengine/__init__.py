@@ -7,7 +7,7 @@ from qframelesswindow5 import AcrylicWindow, FramelessWindow
 
 
 class FramelessWebEngineView(QWebEngineView):
-    """ Frameless web engine view """
+    """Frameless web engine view"""
 
     def __init__(self, parent):
         if sys.platform == "win32" and isinstance(parent.window(), AcrylicWindow):

@@ -20,7 +20,13 @@ import sys
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QDialog, QMainWindow
 
-from .titlebar import TitleBar, TitleBarButton, SvgTitleBarButton, StandardTitleBar, TitleBarBase
+from .titlebar import (
+    TitleBar,
+    TitleBarButton,
+    SvgTitleBarButton,
+    StandardTitleBar,
+    TitleBarBase,
+)
 
 if sys.platform == "win32":
     from .windows import AcrylicWindow
@@ -38,7 +44,7 @@ else:
 
 
 class FramelessDialog(QDialog, FramelessWindow):
-    """ Frameless dialog """
+    """Frameless dialog"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -49,7 +55,7 @@ class FramelessDialog(QDialog, FramelessWindow):
 
 
 class FramelessMainWindow(QMainWindow, FramelessWindow):
-    """ Frameless main window """
+    """Frameless main window"""
 
     def __init__(self, parent=None):
         super().__init__(parent)

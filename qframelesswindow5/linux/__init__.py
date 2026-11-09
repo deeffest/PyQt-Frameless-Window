@@ -9,7 +9,7 @@ from .window_effect import LinuxWindowEffect
 
 
 class LinuxFramelessWindow(QWidget):
-    """ Frameless window for Linux system """
+    """Frameless window for Linux system"""
 
     BORDER_WIDTH = 5
 
@@ -34,11 +34,11 @@ class LinuxFramelessWindow(QWidget):
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
     def refreshBackgroundBlurEffect(self):
-        """ Refresh background blur effect """
+        """Refresh background blur effect"""
         pass
 
     def setStayOnTop(self, isTop: bool):
-        """ set the stay on top status """
+        """set the stay on top status"""
         if isTop:
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         else:
@@ -48,14 +48,14 @@ class LinuxFramelessWindow(QWidget):
         self.show()
 
     def toggleStayOnTop(self):
-        """ toggle the stay on top status """
+        """toggle the stay on top status"""
         if self.windowFlags() & Qt.WindowStaysOnTopHint:
             self.setStayOnTop(False)
         else:
             self.setStayOnTop(True)
 
     def setTitleBar(self, titleBar):
-        """ set custom title bar
+        """set custom title bar
 
         Parameters
         ----------
@@ -69,19 +69,19 @@ class LinuxFramelessWindow(QWidget):
         self.titleBar.raise_()
 
     def setResizeEnabled(self, isEnabled: bool):
-        """ set whether resizing is enabled """
+        """set whether resizing is enabled"""
         self._isResizeEnabled = isEnabled
 
     def isSystemButtonVisible(self):
-        """ Returns whether the system title bar button is visible """
+        """Returns whether the system title bar button is visible"""
         return self._isSystemButtonVisible
 
     def setSystemTitleBarButtonVisible(self, isVisible):
-        """ set the visibility of system title bar button, only works for macOS """
+        """set the visibility of system title bar button, only works for macOS"""
         pass
 
     def systemTitleBarRect(self, size: QSize) -> QRect:
-        """ Returns the system title bar rect, only works for macOS
+        """Returns the system title bar rect, only works for macOS
 
         Parameters
         ----------
@@ -92,18 +92,22 @@ class LinuxFramelessWindow(QWidget):
 
     def eventFilter(self, obj, event):
         et = event.type()
-        if et != QEvent.MouseButtonPress and et != QEvent.MouseMove or not self._isResizeEnabled:
+        if (
+            et != QEvent.MouseButtonPress
+            and et != QEvent.MouseMove
+            or not self._isResizeEnabled
+        ):
             return False
 
         edges = Qt.Edges()
         pos = QMouseEvent(event).globalPos() - self.pos()
         if pos.x() < self.BORDER_WIDTH:
             edges |= Qt.LeftEdge
-        if pos.x() >= self.width()-self.BORDER_WIDTH:
+        if pos.x() >= self.width() - self.BORDER_WIDTH:
             edges |= Qt.RightEdge
         if pos.y() < self.BORDER_WIDTH:
             edges |= Qt.TopEdge
-        if pos.y() >= self.height()-self.BORDER_WIDTH:
+        if pos.y() >= self.height() - self.BORDER_WIDTH:
             edges |= Qt.BottomEdge
 
         # change cursor

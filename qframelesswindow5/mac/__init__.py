@@ -9,7 +9,7 @@ from .window_effect import MacWindowEffect
 
 
 class MacFramelessWindow(QWidget):
-    """ Frameless window for Linux system """
+    """Frameless window for Linux system"""
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -28,7 +28,7 @@ class MacFramelessWindow(QWidget):
         self.titleBar.raise_()
 
     def updateFrameless(self):
-        """ update frameless window """
+        """update frameless window"""
         view = objc.objc_object(c_void_p=self.winId().__int__())
         self.__nsWindow = view.window()
 
@@ -38,7 +38,7 @@ class MacFramelessWindow(QWidget):
         self.setSystemTitleBarButtonVisible(isButtonVisible)
 
     def setStayOnTop(self, isTop: bool):
-        """ set the stay on top status """
+        """set the stay on top status"""
         if isTop:
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
         else:
@@ -48,14 +48,14 @@ class MacFramelessWindow(QWidget):
         self.show()
 
     def toggleStayOnTop(self):
-        """ toggle the stay on top status """
+        """toggle the stay on top status"""
         if self.windowFlags() & Qt.WindowStaysOnTopHint:
             self.setStayOnTop(False)
         else:
             self.setStayOnTop(True)
 
     def setTitleBar(self, titleBar):
-        """ set custom title bar
+        """set custom title bar
 
         Parameters
         ----------
@@ -69,7 +69,7 @@ class MacFramelessWindow(QWidget):
         self.titleBar.raise_()
 
     def setResizeEnabled(self, isEnabled: bool):
-        """ set whether resizing is enabled """
+        """set whether resizing is enabled"""
         self._isResizeEnabled = isEnabled
 
     def resizeEvent(self, e):
@@ -96,7 +96,8 @@ class MacFramelessWindow(QWidget):
     def _hideSystemTitleBar(self, showButton=False):
         # extend view to title bar region
         self.__nsWindow.setStyleMask_(
-            self.__nsWindow.styleMask() | Cocoa.NSFullSizeContentViewWindowMask)
+            self.__nsWindow.styleMask() | Cocoa.NSFullSizeContentViewWindowMask
+        )
         self.__nsWindow.setTitlebarAppearsTransparent_(True)
 
         # disable the moving behavior of system
@@ -115,9 +116,15 @@ class MacFramelessWindow(QWidget):
         self.__nsWindow.setShowsToolbarButton_(isVisible)
 
         isHidden = not isVisible
-        self.__nsWindow.standardWindowButton_(Cocoa.NSWindowCloseButton).setHidden_(isHidden)
-        self.__nsWindow.standardWindowButton_(Cocoa.NSWindowZoomButton).setHidden_(isHidden)
-        self.__nsWindow.standardWindowButton_(Cocoa.NSWindowMiniaturizeButton).setHidden_(isHidden)
+        self.__nsWindow.standardWindowButton_(Cocoa.NSWindowCloseButton).setHidden_(
+            isHidden
+        )
+        self.__nsWindow.standardWindowButton_(Cocoa.NSWindowZoomButton).setHidden_(
+            isHidden
+        )
+        self.__nsWindow.standardWindowButton_(
+            Cocoa.NSWindowMiniaturizeButton
+        ).setHidden_(isHidden)
 
         if isVisible:
             self._updateSystemButtonRect()
@@ -128,7 +135,9 @@ class MacFramelessWindow(QWidget):
 
         # get system title bar button
         leftButton = self.__nsWindow.standardWindowButton_(Cocoa.NSWindowCloseButton)
-        midButton =  self.__nsWindow.standardWindowButton_(Cocoa.NSWindowMiniaturizeButton)
+        midButton = self.__nsWindow.standardWindowButton_(
+            Cocoa.NSWindowMiniaturizeButton
+        )
         rightButton = self.__nsWindow.standardWindowButton_(Cocoa.NSWindowZoomButton)
 
         # get system title bar
@@ -144,7 +153,9 @@ class MacFramelessWindow(QWidget):
         else:
             viewSize = self.__nsWindow.frame().size
 
-        center = self.systemTitleBarRect(QSize(int(viewSize.width), titlebarHeight)).center()
+        center = self.systemTitleBarRect(
+            QSize(int(viewSize.width), titlebarHeight)
+        ).center()
 
         # The origin of the NSWindow coordinate system is in the lower left corner, we do the necessary transformations
         center.setY(titlebarHeight - center.y())
@@ -162,7 +173,7 @@ class MacFramelessWindow(QWidget):
         rightButton.setFrameOrigin_(rightOrigin)
 
     def systemTitleBarRect(self, size: QSize) -> QRect:
-        """ Returns the system title bar rect
+        """Returns the system title bar rect
 
         Parameters
         ----------
@@ -172,12 +183,12 @@ class MacFramelessWindow(QWidget):
         return QRect(0, 0, 75, size.height())
 
     def refreshBackgroundBlurEffect(self):
-        """ Refresh background blur effect """
+        """Refresh background blur effect"""
         pass
 
 
 class AcrylicWindow(MacFramelessWindow):
-    """ A frameless window with acrylic effect """
+    """A frameless window with acrylic effect"""
 
     def __init__(self, parent=None):
         super().__init__(parent)

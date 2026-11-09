@@ -6,12 +6,17 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from ..utils import startSystemMove
-from .title_bar_buttons import (CloseButton, MaximizeButton, MinimizeButton,
-                                SvgTitleBarButton, TitleBarButton)
+from .title_bar_buttons import (
+    CloseButton,
+    MaximizeButton,
+    MinimizeButton,
+    SvgTitleBarButton,
+    TitleBarButton,
+)
 
 
 class TitleBarBase(QWidget):
-    """ Title bar base class """
+    """Title bar base class"""
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -40,7 +45,7 @@ class TitleBarBase(QWidget):
         return super().eventFilter(obj, e)
 
     def mouseDoubleClickEvent(self, event):
-        """ Toggles the maximization state of the window """
+        """Toggles the maximization state of the window"""
         if event.button() != Qt.LeftButton or not self._isDoubleClickEnabled:
             return
 
@@ -59,18 +64,19 @@ class TitleBarBase(QWidget):
         startSystemMove(self.window(), e.globalPos())
 
     def __toggleMaxState(self):
-        """ Toggles the maximization state of the window and change icon """
+        """Toggles the maximization state of the window and change icon"""
         if self.window().isMaximized():
             self.window().showNormal()
         else:
             self.window().showMaximized()
-            
+
         if sys.platform == "win32":
             from ..utils.win32_utils import releaseMouseLeftButton
+
             releaseMouseLeftButton(self.window().winId())
 
     def _isDragRegion(self, pos):
-        """ Check whether the position belongs to the area where dragging is allowed """
+        """Check whether the position belongs to the area where dragging is allowed"""
         width = 0
         for button in self.findChildren(TitleBarButton):
             if button.isVisible():
@@ -79,15 +85,15 @@ class TitleBarBase(QWidget):
         return 0 < pos.x() < self.width() - width
 
     def _hasButtonPressed(self):
-        """ whether any button is pressed """
+        """whether any button is pressed"""
         return any(btn.isPressed() for btn in self.findChildren(TitleBarButton))
 
     def canDrag(self, pos):
-        """ whether the position is draggable """
+        """whether the position is draggable"""
         return self._isDragRegion(pos) and not self._hasButtonPressed()
 
     def setDoubleClickEnabled(self, isEnabled):
-        """ whether to switch window maximization status when double clicked
+        """whether to switch window maximization status when double clicked
 
         Parameters
         ----------
@@ -97,9 +103,8 @@ class TitleBarBase(QWidget):
         self._isDoubleClickEnabled = isEnabled
 
 
-
 class TitleBar(TitleBarBase):
-    """ Title bar with minimize, maximum and close button """
+    """Title bar with minimize, maximum and close button"""
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -116,7 +121,7 @@ class TitleBar(TitleBarBase):
 
 
 class StandardTitleBar(TitleBar):
-    """ Title bar with icon and title """
+    """Title bar with icon and title"""
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -140,7 +145,7 @@ class StandardTitleBar(TitleBar):
         self.window().windowTitleChanged.connect(self.setTitle)
 
     def setTitle(self, title):
-        """ set the title of title bar
+        """set the title of title bar
 
         Parameters
         ----------
@@ -151,7 +156,7 @@ class StandardTitleBar(TitleBar):
         self.titleLabel.adjustSize()
 
     def setIcon(self, icon):
-        """ set the icon of title bar
+        """set the icon of title bar
 
         Parameters
         ----------
